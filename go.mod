@@ -3,6 +3,7 @@ module github.com/advancedlogic/box
 go 1.12
 
 require (
+	github.com/advancedlogic/easy v0.0.0-20190613064909-3c75c307d60c
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gin-gonic/gin v1.4.0
 	github.com/google/uuid v1.1.1
@@ -19,4 +20,5 @@ require (
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 	golang.org/x/text v0.3.1-0.20181227161524-e6919f6577db
+	gopkg.in/resty.v1 v1.12.0
 )
