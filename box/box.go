@@ -16,6 +16,7 @@ import (
 	"github.com/advancedlogic/box/registry"
 	"github.com/advancedlogic/box/store"
 	"github.com/advancedlogic/box/transport"
+	"github.com/google/uuid"
 )
 
 //Box is the main struct for creating a microservice
@@ -241,12 +242,51 @@ func WithAuthN(authn authn.AuthN) Option {
 	}
 }
 
-func WithAuthZ(authz authn.AuthZ) Option {
+func WithAuthZ(authz authz.AuthZ) Option {
 	return func(box Box) error {
 		if authz != nil {
-			box.AuthN = authz
+			box.AuthZ = authz
 			return nil
 		}
 		return errors.New("authz cannot be nil")
+	}
+}
+
+func New(options ...Option) (*Box, error) {
+	box := Box{
+		id:   uuid.New().String(),
+		name: "default",
+	}
+
+	for _, option := range options {
+		err := option(box)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &box, nil
+}
+
+func (b *Box) Run() {
+	println(b.logo)
+
+	go_shutdown_hook.ADD(func() {
+		box.Stop()
+		box.Warn("Goodbye and thanks for all the fish")
+	})
+	if box.registry != nil {
+		box.Info("registry setup")
+		err := box.registry.Register()
+		if err != nil {
+			box.Fatal(err)
+		}
+	}
+	if box.broker != nil {
+		box.Info("broker setup")
+		err := box.broker.Run()
+		if err != nil {
+			box.Fatal(err)
+		}
 	}
 }
