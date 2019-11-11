@@ -1,4 +1,4 @@
-package authz
+package interfaces
 
 type AuthZ interface {
 	NewToken(string) (string, error)
@@ -7,4 +7,3 @@ type AuthZ interface {
 	CheckToken(string) error
 }
 
-type Option func(AuthZ) error

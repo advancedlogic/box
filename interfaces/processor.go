@@ -1,12 +1,8 @@
-package processor
-
-import "github.com/advancedlogic/box/box"
+package interfaces
 
 //Processor is the "plugin" to specialize the microservice
 type Processor interface {
-	Init(box box.Box) error
+	Init(micro Micro) error
 	Close() error
 	Process(interface{}) (interface{}, error)
 }
-
-type Option func(Processor) error

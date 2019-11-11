@@ -1,4 +1,4 @@
-package store
+package interfaces
 
 type Store interface {
 	Create(string, interface{}) error
@@ -9,4 +9,3 @@ type Store interface {
 	Query(...interface{}) (interface{}, error)
 }
 
-type Option func(Store) error

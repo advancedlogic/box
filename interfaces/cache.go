@@ -1,4 +1,4 @@
-package cache
+package interfaces
 
 type Cache interface {
 	Instance() interface{}

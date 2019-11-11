@@ -1,4 +1,4 @@
-package logger
+package interfaces
 
 //Logger defines the interface for logging the application
 type Logger interface {
@@ -11,5 +11,3 @@ type Logger interface {
 	Fatal(string)
 }
 
-//Option is an helper to configure the logger
-type Option func(Logger) error

@@ -7,17 +7,6 @@ import (
 	"github.com/advancedlogic/box/commons"
 )
 
-type AuthN interface {
-	Login(string, string) (interface{}, error)
-	Logout(string) error
-
-	Register(string, string) (interface{}, error)
-	Delete(string) error
-	Reset(string, string) (interface{}, error)
-}
-
-type Option func(AuthN) error
-
 type User struct {
 	Username  string   `json:"username"`
 	Password  string   `json:"password"`

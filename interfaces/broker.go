@@ -1,4 +1,4 @@
-package broker
+package interfaces
 
 type Broker interface {
 	Connect() error
@@ -6,5 +6,3 @@ type Broker interface {
 	Subscribe(string, interface{}) error
 	Close() error
 }
-
-type Option func(Broker) error

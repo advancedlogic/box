@@ -1,4 +1,4 @@
-package client
+package interfaces
 
 type Client interface {
 	GET(interface{}) error
@@ -7,4 +7,3 @@ type Client interface {
 	DELETE(interface{}) error
 }
 
-type Option func(Client) error

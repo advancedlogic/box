@@ -1,4 +1,4 @@
-package transport
+package interfaces
 
 type Transport interface {
 	Listen() error
@@ -9,5 +9,3 @@ type Transport interface {
 	Put(string, interface{})
 	Delete(string, interface{})
 }
-
-type Option func(Transport) error

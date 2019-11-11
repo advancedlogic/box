@@ -3,6 +3,7 @@ package logrus
 import (
 	"errors"
 
+	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/logger"
 	"github.com/sirupsen/logrus"
 )
@@ -16,7 +17,7 @@ const (
 //Possible values are: info, warn, error, fatal, debug.
 //Default value is info.
 func WithLevel(level string) logger.Option {
-	return func(i logger.Logger) error {
+	return func(i interfaces.Logger) error {
 		if level != "" {
 			l := i.(Logrus)
 			l.level = level
@@ -29,7 +30,7 @@ func WithLevel(level string) logger.Option {
 //WithFormat received a format as a string
 //For more details about logrus format specs check their website
 func WithFormat(format string) logger.Option {
-	return func(i logger.Logger) error {
+	return func(i interfaces.Logger) error {
 		if format != "" {
 			l := i.(Logrus)
 			l.format = format
@@ -85,7 +86,7 @@ func New(options ...logger.Option) (*Logrus, error) {
 	return l, nil
 }
 
-//Instance get the instance of the 
+//Instance get the instance of the
 func (l Logrus) Instance() interface{} {
 	return l.Logger
 }

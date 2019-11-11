@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/advancedlogic/box/logger"
+	"github.com/advancedlogic/box/interfaces"
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/advancedlogic/box/configuration"
@@ -13,7 +13,7 @@ import (
 
 //WithName specifies the name of the configuration to open
 func WithName(name string) configuration.Option {
-	return func(i configuration.Configuration) error {
+	return func(i interfaces.Configuration) error {
 		if name != "" {
 			v := i.(*Viper)
 			v.name = name
@@ -24,10 +24,10 @@ func WithName(name string) configuration.Option {
 	}
 }
 
-//WithProvider specifies the name of the provider in case 
+//WithProvider specifies the name of the provider in case
 //you want to manage a remote configuration (e.g. consul, etcd)
 func WithProvider(provider string) configuration.Option {
-	return func(i configuration.Configuration) error {
+	return func(i interfaces.Configuration) error {
 		if provider != "" {
 			v := i.(*Viper)
 			v.provider = provider
@@ -40,7 +40,7 @@ func WithProvider(provider string) configuration.Option {
 
 //WithURI specifies the address of the provider
 func WithURI(uri string) configuration.Option {
-	return func(i configuration.Configuration) error {
+	return func(i interfaces.Configuration) error {
 		if uri != "" {
 			v := i.(*Viper)
 			v.uri = uri
@@ -52,8 +52,8 @@ func WithURI(uri string) configuration.Option {
 }
 
 //WithLogger inject the logger
-func WithLogger(logger logger.Logger) configuration.Option {
-	return func(i configuration.Configuration) error {
+func WithLogger(logger interfaces.Logger) configuration.Option {
+	return func(i interfaces.Configuration) error {
 		if logger != nil {
 			v := i.(*Viper)
 			v.Logger = logger
@@ -66,7 +66,7 @@ func WithLogger(logger logger.Logger) configuration.Option {
 //Viper is a wrapper around the viper library
 type Viper struct {
 	*viper.Viper
-	logger.Logger
+	interfaces.Logger
 
 	name     string
 	provider string

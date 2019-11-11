@@ -4,19 +4,13 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/advancedlogic/box/authn"
-	"github.com/advancedlogic/box/authz"
-	"github.com/advancedlogic/box/broker"
-	"github.com/advancedlogic/box/cache"
-	"github.com/advancedlogic/box/client"
-	"github.com/advancedlogic/box/configuration"
 	"github.com/advancedlogic/box/configuration/viper"
-	"github.com/advancedlogic/box/logger"
-	"github.com/advancedlogic/box/processor"
-	"github.com/advancedlogic/box/registry"
-	"github.com/advancedlogic/box/store"
-	"github.com/advancedlogic/box/transport"
+	"github.com/advancedlogic/box/interfaces"
+	"github.com/advancedlogic/box/micro"
+	"github.com/advancedlogic/box/micro/box"
 	"github.com/google/uuid"
+
+	go_shutdown_hook "github.com/ankit-arora/go-utils/go-shutdown-hook"
 )
 
 //Box is the main struct for creating a microservice
@@ -26,46 +20,49 @@ type Box struct {
 	isRunning bool
 	logo      string
 
-	logger.Logger
-	configuration.Configuration
-	broker.Broker
-	transport.Transport
-	client.Client
-	cache.Cache
-	registry.Registry
-	authn.AuthN
-	authz.AuthZ
-	store.Store
-	processors []processor.Processor
+	logger        interfaces.Logger
+	configuration interfaces.Configuration
+	broker        interfaces.Broker
+	transport     interfaces.Transport
+	client        interfaces.Client
+	cache         interfaces.Cache
+	registry      interfaces.Registry
+	authN         interfaces.AuthN
+	authZ         interfaces.AuthZ
+	store         interfaces.Store
+	processors    []interfaces.Processor
 }
 
 type Option func(Box) error
 
 //WithID(id string) set the id of the µs
-func WithID(id string) Option {
-	return func(box Box) error {
+func WithID(id string) micro.Option {
+	return func(m interfaces.Micro) error {
 		if id == "" {
 			return errors.New("ID cannot be empty")
 		}
+		box := m.(box.Box)
 		box.id = id
 		return nil
 	}
 }
 
 //WithName(name string) set the id of the µs
-func WithName(name string) Option {
-	return func(box Box) error {
+func WithName(name string) micro.Option {
+	return func(m interfaces.Micro) error {
 		if name == "" {
 			return errors.New("name cannot be empty")
 		}
+		box := m.(box.Box)
 		box.name = name
 		return nil
 	}
 }
 
-func WithLogo(logo interface{}) Option {
-	return func(box Box) error {
+func WithLogo(logo interface{}) micro.Option {
+	return func(m interfaces.Micro) error {
 		if logo != nil {
+			box := m.(box.Box)
 			switch logo.(type) {
 			case []byte:
 				box.logo = string(logo.([]byte))
@@ -82,47 +79,47 @@ func WithLogo(logo interface{}) Option {
 	}
 }
 
-func WithRegistry(registry registry.Registry) Option {
+func WithRegistry(registry interfaces.Registry) Option {
 	return func(box Box) error {
 		if registry != nil {
-			box.Registry = registry
+			box.registry = registry
 			return nil
 		}
 		return errors.New("registry cannot be nil")
 	}
 }
 
-func WithTransport(transport transport.Transport) Option {
+func WithTransport(transport interfaces.Transport) Option {
 	return func(box Box) error {
 		if transport != nil {
-			box.Transport = transport
+			box.transport = transport
 			return nil
 		}
 		return errors.New("transport cannot be nil")
 	}
 }
 
-func WithBroker(broker broker.Broker) Option {
+func WithBroker(broker interfaces.Broker) Option {
 	return func(box Box) error {
 		if broker != nil {
-			box.Broker = broker
+			box.broker = broker
 			return nil
 		}
 		return errors.New("broker cannot be nil")
 	}
 }
 
-func WithClient(client client.Client) Option {
+func WithClient(client interfaces.Client) Option {
 	return func(box Box) error {
 		if client != nil {
-			box.Client = client
+			box.client = client
 			return nil
 		}
 		return errors.New("client cannot be nil")
 	}
 }
 
-func WithProcessors(processors ...processor.Processor) Option {
+func WithProcessors(processors ...interfaces.Processor) Option {
 	return func(box Box) error {
 		if processors != nil && len(processors) > 0 {
 			for _, processor := range processors {
@@ -138,7 +135,7 @@ func WithProcessors(processors ...processor.Processor) Option {
 	}
 }
 
-func WithProcessor(processor processor.Processor) Option {
+func WithProcessor(processor interfaces.Processor) Option {
 	return func(box Box) error {
 		if processor != nil {
 			err := processor.Init(box)
@@ -152,34 +149,34 @@ func WithProcessor(processor processor.Processor) Option {
 	}
 }
 
-func WithStore(store store.Store) Option {
+func WithStore(store interfaces.Store) Option {
 	return func(box Box) error {
 		if store != nil {
-			box.Store = store
+			box.store = store
 			return nil
 		}
 		return errors.New("store cannot be nil")
 	}
 }
 
-func WithCache(cache cache.Cache) Option {
+func WithCache(cache interfaces.Cache) Option {
 	return func(box Box) error {
 		if cache != nil {
-			err := cache.Init()
+			err := cache.Connect()
 			if err != nil {
 				return err
 			}
-			box.Cache = cache
+			box.cache = cache
 			return nil
 		}
 		return errors.New("cache cannot be nil")
 	}
 }
 
-func WithConfiguration(configuration configuration.Configuration) Option {
+func WithConfiguration(configuration interfaces.Configuration) Option {
 	return func(box Box) error {
 		if configuration != nil {
-			box.Configuration = configuration
+			box.configuration = configuration
 			return nil
 		}
 		return errors.New("configuration cannot be nil")
@@ -191,14 +188,14 @@ func WithLocalConfiguration() Option {
 		if box.name != "" {
 			conf, err := viper.New(
 				viper.WithName(box.name),
-				viper.WithLogger(box.Logger))
+				viper.WithLogger(box.logger))
 			if err != nil {
 				return err
 			}
 			if err := conf.Open(); err != nil {
 				return err
 			}
-			box.Configuration = conf
+			box.configuration = conf
 		}
 		return errors.New("name cannot be empty")
 	}
@@ -211,41 +208,41 @@ func WithRemoteConfiguration(provider, uri string) Option {
 				viper.WithName(box.name),
 				viper.WithProvider(provider),
 				viper.WithURI(uri),
-				viper.WithLogger(box.Logger))
+				viper.WithLogger(box.logger))
 			if err != nil {
 				return nil
 			}
-			box.Configuration = conf
+			box.configuration = conf
 		}
 
 		return errors.New("provider and uri cannot be empty")
 	}
 }
 
-func WithLogger(logger logger.Logger) Option {
+func WithLogger(logger interfaces.Logger) Option {
 	return func(box Box) error {
 		if logger != nil {
-			box.Logger = logger
+			box.logger = logger
 			return nil
 		}
 		return errors.New("logger cannot be null")
 	}
 }
 
-func WithAuthN(authn authn.AuthN) Option {
+func WithAuthN(authn interfaces.AuthN) Option {
 	return func(box Box) error {
 		if authn != nil {
-			box.AuthN = authn
+			box.authN = authn
 			return nil
 		}
 		return errors.New("authn cannot be nil")
 	}
 }
 
-func WithAuthZ(authz authz.AuthZ) Option {
+func WithAuthZ(authz interfaces.AuthZ) Option {
 	return func(box Box) error {
 		if authz != nil {
-			box.AuthZ = authz
+			box.authZ = authz
 			return nil
 		}
 		return errors.New("authz cannot be nil")
@@ -269,24 +266,91 @@ func New(options ...Option) (*Box, error) {
 }
 
 func (b *Box) Run() {
-	println(b.logo)
+	if b.logo != "" {
+		println(b.logo)
+	}
 
 	go_shutdown_hook.ADD(func() {
-		box.Stop()
-		box.Warn("Goodbye and thanks for all the fish")
+		b.Stop()
+		b.logger.Warn("Goodbye and thanks for all the fish")
 	})
-	if box.registry != nil {
-		box.Info("registry setup")
-		err := box.registry.Register()
+	if b.registry != nil {
+		b.logger.Info("registry setup")
+		err := b.registry.Register()
 		if err != nil {
-			box.Fatal(err)
+			b.logger.Fatal(err.Error())
 		}
 	}
-	if box.broker != nil {
-		box.Info("broker setup")
-		err := box.broker.Run()
+	if b.broker != nil {
+		b.logger.Info("broker setup")
+		err := b.broker.Connect()
 		if err != nil {
-			box.Fatal(err)
+			b.logger.Fatal(err.Error())
 		}
 	}
+
+	if b.transport != nil {
+		b.logger.Info("transport setup")
+		err := b.transport.Listen()
+		if err != nil {
+			b.logger.Fatal(err.Error())
+		}
+	}
+
+	b.isRunning = true
+	go_shutdown_hook.Wait()
+}
+
+func (b *Box) Stop() {
+	if b.broker != nil {
+		b.broker.Close()
+	}
+
+	if b.transport != nil {
+		b.transport.Stop()
+	}
+
+	if b.cache != nil {
+		b.cache.Close()
+	}
+}
+
+func (b *Box) Logger() interfaces.Logger {
+	return b.logger
+}
+
+func (b *Box) Configuration() interfaces.Configuration {
+	return b.configuration
+}
+
+func (b *Box) Cache() interfaces.Cache {
+	return b.cache
+}
+
+func (b *Box) Broker() interfaces.Broker {
+	return b.broker
+}
+
+func (b *Box) Client() interfaces.Client {
+	return b.client
+}
+
+func (b *Box) Transport() interfaces.Transport {
+	return b.transport
+}
+
+func (b *Box) Registry() interfaces.Registry {
+	return b.registry
+}
+
+func (b *Box) AuthN() interfaces.AuthN {
+	return b.authN
+}
+
+func (b *Box) AuthZ() interfaces.AuthZ {
+	return b.AuthZ()
+}
+
+func (b *Box) Store() interfaces.Store {
+	return b.store
 }
