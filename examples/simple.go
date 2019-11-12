@@ -4,8 +4,6 @@ import (
 	"github.com/advancedlogic/box/configuration/viper"
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/logger/logrus"
-
-	"github.com/advancedlogic/box/micro/box"
 )
 
 type Simple struct {
