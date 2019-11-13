@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/advancedlogic/box/box"
 	"github.com/advancedlogic/box/configuration/viper"
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/logger/logrus"
@@ -19,7 +20,7 @@ func (s Simple) Process(data interface{}) (interface{}, error) {
 	s.Logger().Info("This is a simple example")
 	return nil, nil
 }
-  
+
 func (s Simple) Close() error {
 	return nil
 }
