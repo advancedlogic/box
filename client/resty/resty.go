@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/advancedlogic/box/client"
+	"github.com/advancedlogic/box/interfaces"
 	"gopkg.in/resty.v1"
 )
 
@@ -23,7 +24,7 @@ type Resty struct {
 }
 
 func WithUrl(url string) client.Option {
-	return func(client client.Client) error {
+	return func(client interfaces.Client) error {
 		if url != "" {
 			r := client.(*Resty)
 			r.Url = url
@@ -34,7 +35,7 @@ func WithUrl(url string) client.Option {
 }
 
 func AddQueryParam(key, value string) client.Option {
-	return func(client client.Client) error {
+	return func(client interfaces.Client) error {
 		if key != "" && value != "" {
 			r := client.(*Resty)
 			r.QueryParams[key] = value
@@ -45,7 +46,7 @@ func AddQueryParam(key, value string) client.Option {
 }
 
 func AddHeader(key, value string) client.Option {
-	return func(client client.Client) error {
+	return func(client interfaces.Client) error {
 		if key != "" && value != "" {
 			r := client.(*Resty)
 			r.Headers[key] = value
@@ -56,7 +57,7 @@ func AddHeader(key, value string) client.Option {
 }
 
 func AddCookie(key, value string) client.Option {
-	return func(client client.Client) error {
+	return func(client interfaces.Client) error {
 		if key != "" && value != "" {
 			r := client.(*Resty)
 			r.Cookies[key] = value
@@ -67,7 +68,7 @@ func AddCookie(key, value string) client.Option {
 }
 
 func WithAuthToken(token string) client.Option {
-	return func(client client.Client) error {
+	return func(client interfaces.Client) error {
 		if token != "" {
 			r := client.(*Resty)
 			r.AuthToken = token
@@ -78,7 +79,7 @@ func WithAuthToken(token string) client.Option {
 }
 
 func WithBody(body string) client.Option {
-	return func(client client.Client) error {
+	return func(client interfaces.Client) error {
 		if body != "" {
 			r := client.(*Resty)
 			r.Body = body
@@ -89,7 +90,7 @@ func WithBody(body string) client.Option {
 }
 
 func WithBasicAuthentication(username, password string) client.Option {
-	return func(client client.Client) error {
+	return func(client interfaces.Client) error {
 		if username != "" && password != "" {
 			r := client.(*Resty)
 			r.Username = username
@@ -101,7 +102,7 @@ func WithBasicAuthentication(username, password string) client.Option {
 }
 
 func WithX509Certificate(pem, key string) client.Option {
-	return func(client client.Client) error {
+	return func(client interfaces.Client) error {
 		if pem != "" && key != "" {
 			r := client.(*Resty)
 			r.key = key

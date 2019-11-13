@@ -6,6 +6,7 @@ import (
 
 	"github.com/advancedlogic/box/commons"
 	"github.com/advancedlogic/box/store"
+	"github.com/advancedlogic/box/interfaces"
 	"github.com/hashicorp/vault/api"
 	"github.com/pkg/errors"
 )
@@ -20,7 +21,7 @@ type Vault struct {
 }
 
 func WithToken(token string) store.Option {
-	return func(s store.Store) error {
+	return func(s interfaces.Store) error {
 		if token != "" {
 			vault := s.(*Vault)
 			vault.token = token
@@ -31,7 +32,7 @@ func WithToken(token string) store.Option {
 }
 
 func WithNamespace(namespace string) store.Option {
-	return func(s store.Store) error {
+	return func(s interfaces.Store) error {
 		if namespace != "" {
 			vault := s.(*Vault)
 			vault.namespace = namespace
@@ -42,7 +43,7 @@ func WithNamespace(namespace string) store.Option {
 }
 
 func WithServers(servers ...string) store.Option {
-	return func(s store.Store) error {
+	return func(s interfaces.Store) error {
 		if len(servers) > 0 {
 			vault := s.(*Vault)
 			for _, server := range servers {
@@ -55,7 +56,7 @@ func WithServers(servers ...string) store.Option {
 }
 
 func SkipTLSVerification(skip bool) store.Option {
-	return func(s store.Store) error {
+	return func(s interfaces.Store) error {
 		vault := s.(*Vault)
 		vault.skipTLSVerification = skip
 		return nil

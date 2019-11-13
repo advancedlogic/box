@@ -19,7 +19,7 @@ const (
 func WithLevel(level string) logger.Option {
 	return func(i interfaces.Logger) error {
 		if level != "" {
-			l := i.(Logrus)
+			l := i.(*Logrus)
 			l.level = level
 			return nil
 		}
@@ -32,7 +32,7 @@ func WithLevel(level string) logger.Option {
 func WithFormat(format string) logger.Option {
 	return func(i interfaces.Logger) error {
 		if format != "" {
-			l := i.(Logrus)
+			l := i.(*Logrus)
 			l.format = format
 			return nil
 		}
@@ -51,7 +51,9 @@ type Logrus struct {
 
 //New instantiate a new Logger with the given options
 func New(options ...logger.Option) (*Logrus, error) {
-	l := &Logrus{}
+	l := &Logrus{
+		Logger: logrus.New(),
+	}
 	for _, option := range options {
 		err := option(l)
 		if err != nil {
@@ -93,25 +95,25 @@ func (l Logrus) Instance() interface{} {
 
 //Info logging level
 func (l Logrus) Info(message string) {
-	l.Info(message)
+	l.Logger.Info(message)
 }
 
 //Debug logging level
 func (l Logrus) Debug(message string) {
-	l.Debug(message)
+	l.Logger.Debug(message)
 }
 
 //Warn logging level
 func (l Logrus) Warn(message string) {
-	l.Warn(message)
+	l.Logger.Warn(message)
 }
 
 //Error logging level
 func (l Logrus) Error(message string) {
-	l.Error(message)
+	l.Logger.Error(message)
 }
 
 //Fatal logging level
 func (l Logrus) Fatal(message string) {
-	l.Fatal(message)
+	l.Logger.Fatal(message)
 }

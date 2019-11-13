@@ -9,7 +9,7 @@ type Micro interface {
 	Broker() Broker
 	Transport() Transport
 	Logger() Logger
-	Processor() Processor
+	Processors() []Processor
 	AuthN() AuthN
 	AuthZ() AuthZ
 	Cache() Cache

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/advancedlogic/box/logger"
+	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/transport"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -17,7 +17,7 @@ import (
 )
 
 type Rest struct {
-	logger.Logger
+	interfaces.Logger
 	port         int
 	health       string
 	readTimeout  time.Duration
@@ -30,7 +30,7 @@ type Rest struct {
 }
 
 func WithPort(port int) transport.Option {
-	return func(t transport.Transport) error {
+	return func(t interfaces.Transport) error {
 		if port > 0 {
 			rest := t.(*Rest)
 			rest.port = port
@@ -41,7 +41,7 @@ func WithPort(port int) transport.Option {
 }
 
 func WithHealthCheckEndpoint(health string) transport.Option {
-	return func(t transport.Transport) error {
+	return func(t interfaces.Transport) error {
 		if health != "" {
 			rest := t.(*Rest)
 			rest.health = health
@@ -52,7 +52,7 @@ func WithHealthCheckEndpoint(health string) transport.Option {
 }
 
 func WithReadTimeout(timeout time.Duration) transport.Option {
-	return func(i transport.Transport) error {
+	return func(i interfaces.Transport) error {
 		if timeout != 0 {
 			r := i.(*Rest)
 			r.readTimeout = timeout
@@ -62,7 +62,7 @@ func WithReadTimeout(timeout time.Duration) transport.Option {
 }
 
 func WithWriteTimeout(timeout time.Duration) transport.Option {
-	return func(i transport.Transport) error {
+	return func(i interfaces.Transport) error {
 		if timeout != 0 {
 			r := i.(*Rest)
 			r.writeTimeout = timeout

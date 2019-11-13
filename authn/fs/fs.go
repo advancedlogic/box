@@ -8,6 +8,7 @@ import (
 
 	"github.com/advancedlogic/box/authn"
 	"github.com/advancedlogic/box/commons"
+	"github.com/advancedlogic/box/interfaces"
 )
 
 type FS struct {
@@ -15,7 +16,7 @@ type FS struct {
 }
 
 func WithFolder(folder string) authn.Option {
-	return func(a authn.AuthN) error {
+	return func(a interfaces.AuthN) error {
 		if folder != "" {
 			fs := a.(*FS)
 			fs.folder = folder

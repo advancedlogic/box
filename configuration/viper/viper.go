@@ -51,22 +51,9 @@ func WithURI(uri string) configuration.Option {
 	}
 }
 
-//WithLogger inject the logger
-func WithLogger(logger interfaces.Logger) configuration.Option {
-	return func(i interfaces.Configuration) error {
-		if logger != nil {
-			v := i.(*Viper)
-			v.Logger = logger
-			return nil
-		}
-		return errors.New("")
-	}
-}
-
 //Viper is a wrapper around the viper library
 type Viper struct {
 	*viper.Viper
-	interfaces.Logger
 
 	name     string
 	provider string
@@ -125,4 +112,13 @@ func (v Viper) Open(paths ...string) error {
 //Get return a configuration property given a key
 func (v *Viper) Get(key string) (interface{}, error) {
 	return v.Get(key)
+}
+
+func (v *Viper) Default(key string, def interface{}) interface{} {
+	value, err := v.Get(key)
+	if err != nil {
+		return def
+	} 
+
+	return value
 }

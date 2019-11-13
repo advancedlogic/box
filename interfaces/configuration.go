@@ -4,4 +4,5 @@ package interfaces
 type Configuration interface {
 	Open(...string) error
 	Get(string) (interface{}, error)
+	Default(string, interface{}) interface{}
 }

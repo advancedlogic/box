@@ -2,8 +2,10 @@ package ledis
 
 import (
 	"errors"
-	"github.com/go-redis/redis"
+
 	"github.com/advancedlogic/box/cache"
+	"github.com/advancedlogic/box/interfaces"
+	"github.com/go-redis/redis"
 )
 
 type Ledis struct {
@@ -17,7 +19,7 @@ type Ledis struct {
 }
 
 func WithCollection(collection string) cache.Option {
-	return func(c cache.Cache) error {
+	return func(c interfaces.Cache) error {
 		if collection != "" {
 			ledis := c.(*Ledis)
 			ledis.collection = collection
@@ -28,7 +30,7 @@ func WithCollection(collection string) cache.Option {
 }
 
 func WithPassowrd(password string) cache.Option {
-	return func(c cache.Cache) error {
+	return func(c interfaces.Cache) error {
 		if password != "" {
 			ledis := c.(*Ledis)
 			ledis.password = password
@@ -39,7 +41,7 @@ func WithPassowrd(password string) cache.Option {
 }
 
 func WithDB(db int) cache.Option {
-	return func(c cache.Cache) error {
+	return func(c interfaces.Cache) error {
 		if db > -1 {
 			ledis := c.(*Ledis)
 			ledis.db = db
@@ -50,7 +52,7 @@ func WithDB(db int) cache.Option {
 }
 
 func AddEndpoints(endpoints ...string) cache.Option {
-	return func(c cache.Cache) error {
+	return func(c interfaces.Cache) error {
 		for _, endpoint := range endpoints {
 			if endpoint != "" {
 				ledis := c.(*Ledis)

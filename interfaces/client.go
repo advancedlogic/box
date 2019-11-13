@@ -6,4 +6,3 @@ type Client interface {
 	PUT(interface{}) error
 	DELETE(interface{}) error
 }
-

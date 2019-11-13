@@ -4,17 +4,18 @@ import (
 	"errors"
 
 	"github.com/advancedlogic/box/broker"
-	"github.com/advancedlogic/box/logger"
+	"github.com/advancedlogic/box/interfaces"
 	"github.com/nats-io/go-nats"
 )
 
 const (
-	errorEndpointEmpty = "endpoint cannot be empty"
+	errorEndpointEmpty         = "endpoint cannot be empty"
 	errorCannotCloseConnection = "broker cannot be closed"
+	errorLoggerNil             = "logger cannot be nil"
 )
 
 type Nats struct {
-	logger.Logger
+	interfaces.Logger
 
 	conn          *nats.Conn
 	endpoint      string
@@ -23,7 +24,7 @@ type Nats struct {
 }
 
 func WithEndpoint(endpoint string) broker.Option {
-	return func(i broker.Broker) error {
+	return func(i interfaces.Broker) error {
 		if endpoint != "" {
 			n := i.(*Nats)
 			n.endpoint = endpoint
@@ -33,9 +34,20 @@ func WithEndpoint(endpoint string) broker.Option {
 	}
 }
 
+func WithLogger(logger interfaces.Logger) broker.Option {
+	return func(i interfaces.Broker) error {
+		if logger != nil {
+			n := i.(*Nats)
+			n.Logger = logger
+			return nil
+		}
+		return errors.New(errorLoggerNil)
+	}
+}
+
 func (n *Nats) Connect() error {
-	var conn *nats.Conn
-	if conn, err := nats.Connect(n.endpoint); err != nil {
+	conn, err := nats.Connect(n.endpoint)
+	if err != nil {
 		return err
 	}
 	n.conn = conn
@@ -49,7 +61,7 @@ func (n *Nats) Connect() error {
 	return nil
 }
 
-func (n *Nats) Publish(topic string, message interface{}) error {
+func (n Nats) Publish(topic string, message interface{}) error {
 	var m []byte
 	switch message.(type) {
 	case string:
@@ -65,7 +77,7 @@ func (n *Nats) Subscribe(topic string, handler interface{}) error {
 	return nil
 }
 
-func (n *Nats) Close() error {
+func (n Nats) Close() error {
 	if n.conn != nil {
 		n.conn.Close()
 		return nil
