@@ -26,11 +26,12 @@ func (s Simple) Close() error {
 }
 
 func main() {
-	logger, err := logrus.New(logrus.WithLevel("info"))
+	configuration, err := viper.New()
 	if err != nil {
 		panic(err)
 	}
-	configuration, err := viper.New(viper.WithLogger(logger))
+
+	logger, err := logrus.New(logrus.WithLevel(configuration.Default("level", "info").(string)))
 	if err != nil {
 		panic(err)
 	}
