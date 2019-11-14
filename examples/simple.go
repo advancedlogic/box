@@ -1,10 +1,14 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/advancedlogic/box/box"
 	"github.com/advancedlogic/box/configuration/viper"
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/logger/logrus"
+	"github.com/advancedlogic/box/transport/rest"
+	"github.com/gin-gonic/gin"
 )
 
 type Simple struct {
@@ -36,12 +40,22 @@ func main() {
 		panic(err)
 	}
 
+	transport, err := rest.New(rest.WithPort(9999))
+	if err != nil {
+		panic(err)
+	}
+
+	transport.Get("/test", func(c *gin.Context) {
+		c.String(http.StatusOK, "It works")
+	})
+
 	processor := Simple{}
 
 	box, err := box.New(
 		box.WithLogger(logger),
 		box.WithConfiguration(configuration),
 		box.WithProcessor(processor),
+		box.WithTransport(transport),
 	)
 	if err != nil {
 		panic(err)

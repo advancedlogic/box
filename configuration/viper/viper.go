@@ -110,15 +110,14 @@ func (v Viper) Open(paths ...string) error {
 }
 
 //Get return a configuration property given a key
-func (v *Viper) Get(key string) (interface{}, error) {
-	return v.Get(key)
+func (v *Viper) Get(key string) interface{} {
+	return v.Viper.Get(key)
 }
 
 func (v *Viper) Default(key string, def interface{}) interface{} {
-	value, err := v.Get(key)
-	if err != nil {
+	value := v.Get(key)
+	if value == nil {
 		return def
-	} 
-
+	}
 	return value
 }

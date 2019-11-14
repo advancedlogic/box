@@ -5,7 +5,7 @@ import (
 
 	"github.com/advancedlogic/box/broker"
 	"github.com/advancedlogic/box/interfaces"
-	"github.com/nats-io/go-nats"
+	nats "github.com/nats-io/nats.go"
 )
 
 const (

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/store"
 	minio "github.com/minio/minio-go/v6"
 )
@@ -18,7 +19,7 @@ type Minio struct {
 }
 
 func WithLocation(location string) store.Option {
-	return func(i store.Store) error {
+	return func(i interfaces.Store) error {
 		if location != "" {
 			m := i.(*Minio)
 			m.location = location
@@ -29,7 +30,7 @@ func WithLocation(location string) store.Option {
 }
 
 func WithBucket(bucket string) store.Option {
-	return func(i store.Store) error {
+	return func(i interfaces.Store) error {
 		if bucket != "" {
 			m := i.(*Minio)
 			m.bucket = bucket
@@ -40,7 +41,7 @@ func WithBucket(bucket string) store.Option {
 }
 
 func WithEndpoint(endpoint string) store.Option {
-	return func(i store.Store) error {
+	return func(i interfaces.Store) error {
 		if endpoint != "" {
 			m := i.(*Minio)
 			m.endpoint = endpoint
@@ -51,7 +52,7 @@ func WithEndpoint(endpoint string) store.Option {
 }
 
 func WithAccessKey(accessKey string) store.Option {
-	return func(i store.Store) error {
+	return func(i interfaces.Store) error {
 		if accessKey != "" {
 			m := i.(*Minio)
 			m.accessKey = accessKey
@@ -62,7 +63,7 @@ func WithAccessKey(accessKey string) store.Option {
 }
 
 func WithSecretKey(secretKey string) store.Option {
-	return func(i store.Store) error {
+	return func(i interfaces.Store) error {
 		if secretKey != "" {
 			m := i.(*Minio)
 			m.secretKey = secretKey
@@ -73,7 +74,7 @@ func WithSecretKey(secretKey string) store.Option {
 }
 
 func WithCredentials(accessKey, secretKey string) store.Option {
-	return func(i store.Store) error {
+	return func(i interfaces.Store) error {
 		if accessKey != "" && secretKey != "" {
 			m := i.(*Minio)
 			m.accessKey = accessKey
@@ -84,7 +85,7 @@ func WithCredentials(accessKey, secretKey string) store.Option {
 	}
 }
 
-func New(options ...Option) (*Minio, error) {
+func New(options ...store.Option) (*Minio, error) {
 	m := &Minio{
 		location: "default",
 		bucket:   "default",

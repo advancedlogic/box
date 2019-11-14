@@ -11,8 +11,6 @@ import (
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/transport"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
-	ginlogrus "github.com/toorop/gin-logrus"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
@@ -121,7 +119,7 @@ func New(options ...transport.Option) (*Rest, error) {
 
 func (r *Rest) Listen() error {
 	router := r.router
-	router.Use(ginlogrus.Logger(r.Logger.Instance().(*logrus.Logger)), gin.Recovery())
+	//router.Use(ginlogrus.Logger(r.Logger.Instance().(*logrus.Logger)), gin.Recovery())
 	router.GET(r.health, func(c *gin.Context) {
 		c.String(200, "transport service is good")
 	})
