@@ -8,4 +8,5 @@ type Transport interface {
 	Post(string, interface{})
 	Put(string, interface{})
 	Delete(string, interface{})
+	Static(string, string)
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/transport"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"github.com/toorop/gin-logrus"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
@@ -25,6 +27,17 @@ type Rest struct {
 	server       *http.Server
 	www          string
 	router       *gin.Engine
+}
+
+func WithLogger(logger interfaces.Logger) transport.Option {
+	return func(t interfaces.Transport) error {
+		if logger != nil {
+			rest := t.(*Rest)
+			rest.Logger = logger
+			return nil
+		}
+		return errors.New("logger cannot be nil")
+	}
 }
 
 func WithPort(port int) transport.Option {
@@ -119,7 +132,8 @@ func New(options ...transport.Option) (*Rest, error) {
 
 func (r *Rest) Listen() error {
 	router := r.router
-	//router.Use(ginlogrus.Logger(r.Logger.Instance().(*logrus.Logger)), gin.Recovery())
+	logger := r.Instance().(*logrus.Logger)
+	router.Use(ginlogrus.Logger(logger), gin.Recovery())
 	router.GET(r.health, func(c *gin.Context) {
 		c.String(200, "transport service is good")
 	})
@@ -177,4 +191,8 @@ func (r *Rest) Put(url string, h interface{}) {
 func (r *Rest) Delete(url string, h interface{}) {
 	handler := h.(func(c *gin.Context))
 	r.router.DELETE(url, handler)
+}
+
+func (r *Rest) Static(url string, folder string) {
+	r.router.Static(url, folder)
 }

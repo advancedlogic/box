@@ -40,7 +40,10 @@ func main() {
 		panic(err)
 	}
 
-	transport, err := rest.New(rest.WithPort(9999))
+	transport, err := rest.New(
+		rest.WithPort(9999),
+		rest.WithLogger(logger),
+	)
 	if err != nil {
 		panic(err)
 	}
