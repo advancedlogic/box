@@ -45,6 +45,10 @@ func WithLogger(logger interfaces.Logger) broker.Option {
 	}
 }
 
+func (n *Nats) Instance() interface{} {
+	return n.conn
+}
+
 func (n *Nats) Connect() error {
 	conn, err := nats.Connect(n.endpoint)
 	if err != nil {

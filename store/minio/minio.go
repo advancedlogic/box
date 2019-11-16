@@ -101,6 +101,10 @@ func New(options ...store.Option) (*Minio, error) {
 	return m, nil
 }
 
+func (m Minio) Instance() interface{} {
+	return nil
+}
+
 func (m *Minio) Create(key string, data interface{}) error {
 	reader := strings.NewReader(data.(string))
 	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)

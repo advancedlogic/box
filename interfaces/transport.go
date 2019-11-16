@@ -1,6 +1,8 @@
 package interfaces
 
 type Transport interface {
+	Instance() interface{}
+
 	Listen() error
 	Stop() error
 

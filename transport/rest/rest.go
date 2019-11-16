@@ -130,6 +130,10 @@ func New(options ...transport.Option) (*Rest, error) {
 	return rest, nil
 }
 
+func (r *Rest) Instance() interface{} {
+	return r.router
+}
+
 func (r *Rest) Listen() error {
 	router := r.router
 	logger := r.Instance().(*logrus.Logger)

@@ -74,6 +74,10 @@ func New(options ...configuration.Option) (*Viper, error) {
 	return v, nil
 }
 
+func (v Viper) Instance() interface{} {
+	return v.Viper
+}
+
 //Open one or more configuration files
 func (v Viper) Open(paths ...string) error {
 	v.SetConfigName(v.name)
