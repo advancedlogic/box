@@ -12,14 +12,14 @@ import (
 	"github.com/advancedlogic/box/transport"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"github.com/toorop/gin-logrus"
+	ginlogrus "github.com/toorop/gin-logrus"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
 type Rest struct {
 	interfaces.Logger
 	port         int
-	health       string
+	healthEndpoint       string
 	readTimeout  time.Duration
 	writeTimeout time.Duration
 	cert         string
@@ -51,11 +51,11 @@ func WithPort(port int) transport.Option {
 	}
 }
 
-func WithHealthCheckEndpoint(health string) transport.Option {
+func WithHealthCheckEndpoint(healthEndpoint string) transport.Option {
 	return func(t interfaces.Transport) error {
-		if health != "" {
+		if healthEndpoint != "" {
 			rest := t.(*Rest)
-			rest.health = health
+			rest.healthEndpoint = healthEndpoint
 			return nil
 		}
 		return errors.New("health check endpoint cannot be empty")
@@ -116,6 +116,7 @@ func (r *Rest) findAlternativePort() error {
 func New(options ...transport.Option) (*Rest, error) {
 	rest := &Rest{
 		port:         8080,
+		healthEndpoint:       "/healthcheck",
 		readTimeout:  5 * time.Second,
 		writeTimeout: 5 * time.Second,
 		router:       gin.New(),
@@ -136,9 +137,9 @@ func (r *Rest) Instance() interface{} {
 
 func (r *Rest) Listen() error {
 	router := r.router
-	logger := r.Instance().(*logrus.Logger)
+	logger := r.Logger.Instance().(*logrus.Logger)
 	router.Use(ginlogrus.Logger(logger), gin.Recovery())
-	router.GET(r.health, func(c *gin.Context) {
+	router.GET(r.healthEndpoint, func(c *gin.Context) {
 		c.String(200, "transport service is good")
 	})
 

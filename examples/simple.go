@@ -8,6 +8,7 @@ import (
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/logger/logrus"
 	"github.com/advancedlogic/box/transport/rest"
+	"github.com/advancedlogic/box/registry/consul"
 	"github.com/gin-gonic/gin"
 )
 
@@ -52,13 +53,23 @@ func main() {
 		c.String(http.StatusOK, "It works")
 	})
 
+	registry, err := consul.New(
+		consul.WithLogger(logger),
+		consul.WithPort(9999),
+	)
+	if err != nil {
+		panic(err)
+	}
+
 	processor := Simple{}
 
 	box, err := box.New(
+		box.WithName("simple"),
 		box.WithLogger(logger),
 		box.WithConfiguration(configuration),
 		box.WithProcessor(processor),
 		box.WithTransport(transport),
+		box.WithRegistry(registry),
 	)
 	if err != nil {
 		panic(err)

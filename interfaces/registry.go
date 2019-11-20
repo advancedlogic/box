@@ -1,7 +1,7 @@
 package interfaces
 
 type Registry interface {
-	Instance() interface{}
-	Register() error
-	Search(string) (interface{}, error)
+	Register(string) error
+	DeRegister(string) error
+	Service(string, string) (interface{}, interface{}, error)
 }

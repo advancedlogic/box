@@ -288,7 +288,7 @@ func (b *Box) Run() {
 
 	if b.registry != nil {
 		b.logger.Info("registry setup")
-		err := b.registry.Register()
+		err := b.registry.Register(b.name)
 		if err != nil {
 			b.logger.Fatal(err.Error())
 		}
