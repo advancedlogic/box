@@ -1,8 +1,6 @@
 package interfaces
 
 type Store interface {
-	Instance() interface{}
-
 	Create(string, interface{}) error
 	Read(string) (interface{}, error)
 	Update(string, interface{}) error

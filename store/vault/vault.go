@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/advancedlogic/box/commons"
-	"github.com/advancedlogic/box/store"
 	"github.com/advancedlogic/box/interfaces"
+	"github.com/advancedlogic/box/store"
 	"github.com/hashicorp/vault/api"
 	"github.com/pkg/errors"
 )
@@ -148,7 +148,7 @@ func (v *Vault) List(params ...interface{}) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	secret, err := client.  //.Logical().List(fmt.Sprintf("/%s", v.namespace))
+	secret, err := client.Logical().List(fmt.Sprintf("/%s", v.namespace))
 	if err != nil {
 		return nil, err
 	}
