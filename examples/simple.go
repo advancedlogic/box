@@ -65,6 +65,7 @@ func main() {
 
 	box, err := box.New(
 		box.WithName("simple"),
+		box.WithLogo("banner.txt"),
 		box.WithLogger(logger),
 		box.WithConfiguration(configuration),
 		box.WithProcessor(processor),

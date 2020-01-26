@@ -2,10 +2,11 @@ package nats
 
 import (
 	"errors"
+	"reflect"
 
 	"github.com/advancedlogic/box/broker"
 	"github.com/advancedlogic/box/interfaces"
-	nats "github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go"
 )
 
 const (
@@ -45,6 +46,20 @@ func WithLogger(logger interfaces.Logger) broker.Option {
 	}
 }
 
+func New(options ...broker.Option) (*Nats, error) {
+	nats := &Nats{
+		endpoint:      "localhost:4222",
+		handlers:      make(map[string]func(*nats.Msg)),
+		subscriptions: make(map[string]*nats.Subscription),
+	}
+	for _, option := range options {
+		if err := option(nats); err != nil {
+			return nil, err
+		}
+	}
+	return nats, nil
+}
+
 func (n *Nats) Instance() interface{} {
 	return n.conn
 }
@@ -56,7 +71,7 @@ func (n *Nats) Connect() error {
 	}
 	n.conn = conn
 	for topic, handler := range n.handlers {
-		subscription, err := n.conn.Subscribe(topic, handler)
+		subscription, err := n.conn.QueueSubscribe(topic, "default", handler)
 		if err != nil {
 			return err
 		}
@@ -77,7 +92,9 @@ func (n Nats) Publish(topic string, message interface{}) error {
 }
 
 func (n *Nats) Subscribe(topic string, handler interface{}) error {
-	n.handlers[topic] = handler.(func(*nats.Msg))
+	println(reflect.TypeOf(handler))
+	f := handler.(func(msg *nats.Msg))
+	n.handlers[topic] = f
 	return nil
 }
 
