@@ -2,7 +2,6 @@ package nats
 
 import (
 	"errors"
-	"reflect"
 
 	"github.com/advancedlogic/box/broker"
 	"github.com/advancedlogic/box/interfaces"
@@ -11,7 +10,6 @@ import (
 
 const (
 	errorEndpointEmpty         = "endpoint cannot be empty"
-	errorCannotCloseConnection = "broker cannot be closed"
 	errorLoggerNil             = "logger cannot be nil"
 )
 
@@ -92,7 +90,6 @@ func (n Nats) Publish(topic string, message interface{}) error {
 }
 
 func (n *Nats) Subscribe(topic string, handler interface{}) error {
-	println(reflect.TypeOf(handler))
 	f := handler.(func(msg *nats.Msg))
 	n.handlers[topic] = f
 	return nil
