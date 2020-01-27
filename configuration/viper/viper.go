@@ -128,25 +128,40 @@ func (v *Viper) Default(key string, def interface{}) interface{} {
 
 func (v *Viper) String(key string, def string) string {
 	value := v.GetString(key)
+	if value == "" {
+		return def
+	}
 	return value
 }
 
 func (v *Viper) Int(key string, def int) int {
 	value := v.GetInt(key)
+	if value == 0 {
+		return def
+	}
 	return value
 }
 
 func (v *Viper) Int32(key string, def int32) int32 {
 	value := v.GetInt32(key)
+	if value == 0 {
+		return def
+	}
 	return value
 }
 
 func (v *Viper) Int64(key string, def int64) int64 {
 	value := v.GetInt64(key)
+	if value == 0 {
+		return def
+	}
 	return value
 }
 
 func (v *Viper) Float(key string, def float64) float64 {
 	value := v.GetFloat64(key)
+	if value == 0.0 {
+		return def
+	}
 	return value
 }
