@@ -11,6 +11,7 @@ import (
 const (
 	errorEndpointEmpty         = "endpoint cannot be empty"
 	errorLoggerNil             = "logger cannot be nil"
+	errorCannotCloseConnection = "cannot close connection"
 )
 
 type Nats struct {
