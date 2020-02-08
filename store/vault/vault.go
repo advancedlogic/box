@@ -99,26 +99,26 @@ func (v *Vault) connect() (*api.Client, error) {
 	return client, nil
 }
 
-func (v *Vault) Create(key string, value interface{}) error {
+func (v *Vault) Create(namespace string, key string, value interface{}) error {
 	client, err := v.connect()
 	if err != nil {
 		return err
 	}
 
-	_, err = client.Logical().Write(fmt.Sprintf("/%s/%s", v.namespace, key), value.(map[string]interface{}))
+	_, err = client.Logical().Write(fmt.Sprintf("/%s/%s", namespace, key), value.(map[string]interface{}))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (v *Vault) Read(key string) (interface{}, error) {
+func (v *Vault) Read(namespace string, key string) (interface{}, error) {
 	client, err := v.connect()
 	if err != nil {
 		return nil, err
 	}
 
-	secret, err := client.Logical().Read(fmt.Sprintf("/%s/%s", v.namespace, key))
+	secret, err := client.Logical().Read(fmt.Sprintf("/%s/%s", namespace, key))
 	if err != nil {
 		return nil, err
 	}
@@ -126,35 +126,35 @@ func (v *Vault) Read(key string) (interface{}, error) {
 	return secret.Data, nil
 }
 
-func (v *Vault) Update(key string, value interface{}) error {
-	return v.Create(key, value)
+func (v *Vault) Update(namespace string, key string, value interface{}) error {
+	return v.Create(namespace, key, value)
 }
 
-func (v *Vault) Delete(key string) error {
+func (v *Vault) Delete(namespace string, key string) error {
 	client, err := v.connect()
 	if err != nil {
 		return err
 	}
 
-	_, err = client.Logical().Delete(fmt.Sprintf("/%s/%s", v.namespace, key))
+	_, err = client.Logical().Delete(fmt.Sprintf("/%s/%s", namespace, key))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (v *Vault) List(params ...interface{}) (interface{}, error) {
+func (v *Vault) List(namespace string, params ...interface{}) (interface{}, error) {
 	client, err := v.connect()
 	if err != nil {
 		return nil, err
 	}
-	secret, err := client.Logical().List(fmt.Sprintf("/%s", v.namespace))
+	secret, err := client.Logical().List(fmt.Sprintf("/%s", namespace))
 	if err != nil {
 		return nil, err
 	}
 	return secret.Data, nil
 }
 
-func (v *Vault) Query(params ...interface{}) (interface{}, error) {
+func (v *Vault) Query(namespace string, params ...interface{}) (interface{}, error) {
 	return nil, nil
 }

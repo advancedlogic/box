@@ -165,3 +165,11 @@ func (v *Viper) Float(key string, def float64) float64 {
 	}
 	return value
 }
+
+func (v *Viper) Bool(key string, def bool) bool {
+	value := v.GetBool(key)
+	if value == false {
+		return def
+	}
+	return value
+}

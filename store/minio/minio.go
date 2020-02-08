@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"strings"
+	"sync"
 
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/store"
@@ -12,10 +13,11 @@ import (
 
 type Minio struct {
 	location  string
-	bucket    string
 	endpoint  string
+	bucket    string
 	accessKey string
 	secretKey string
+	lock      sync.RWMutex
 }
 
 func WithLocation(location string) store.Option {
@@ -90,6 +92,7 @@ func New(options ...store.Option) (*Minio, error) {
 		location: "default",
 		bucket:   "default",
 		endpoint: "localhost:9000",
+		lock:     sync.RWMutex{},
 	}
 
 	for _, option := range options {
@@ -105,13 +108,15 @@ func (m Minio) Instance() interface{} {
 	return nil
 }
 
-func (m *Minio) Create(key string, data interface{}) error {
+func (m *Minio) Create(bucket string, key string, data interface{}) error {
 	reader := strings.NewReader(data.(string))
 	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)
 	if err != nil {
 		return err
 	}
-	_, err = client.PutObject(m.bucket, key, reader, -1, minio.PutObjectOptions{
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	_, err = client.PutObject(bucket, key, reader, -1, minio.PutObjectOptions{
 		ContentType: "plain/txt",
 	})
 	if err != nil {
@@ -121,13 +126,15 @@ func (m *Minio) Create(key string, data interface{}) error {
 	return nil
 }
 
-func (m *Minio) Read(key string) (interface{}, error) {
+func (m *Minio) Read(bucket string, key string) (interface{}, error) {
 	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)
 	if err != nil {
 		return "", err
 	}
 
-	reader, err := client.GetObject(m.bucket, key, minio.GetObjectOptions{})
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	reader, err := client.GetObject(bucket, key, minio.GetObjectOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -140,20 +147,21 @@ func (m *Minio) Read(key string) (interface{}, error) {
 	}
 }
 
-func (m *Minio) Update(key string, data interface{}) error {
-	return m.Create(key, data)
+func (m *Minio) Update(bucket string, key string, data interface{}) error {
+	return m.Create(bucket, key, data)
 }
 
-func (m *Minio) Delete(key string) error {
+func (m *Minio) Delete(bucket string, key string) error {
 	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)
 	if err != nil {
 		return err
 	}
-
-	return client.RemoveObject(m.bucket, key)
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	return client.RemoveObject(bucket, key)
 }
 
-func (m *Minio) List(params ...interface{}) (interface{}, error) {
+func (m *Minio) List(bucket string, params ...interface{}) (interface{}, error) {
 	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)
 	if err != nil {
 		return nil, err
@@ -161,12 +169,14 @@ func (m *Minio) List(params ...interface{}) (interface{}, error) {
 	doneCh := make(chan struct{})
 	defer close(doneCh)
 	values := make([]interface{}, 0)
-	for value := range client.ListObjectsV2(m.bucket, "", true, doneCh) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	for value := range client.ListObjectsV2(bucket, "", true, doneCh) {
 		values = append(values, value)
 	}
 	return values, nil
 }
 
-func (m *Minio) Query(params ...interface{}) (interface{}, error) {
+func (m *Minio) Query(bucket string, params ...interface{}) (interface{}, error) {
 	return nil, nil
 }

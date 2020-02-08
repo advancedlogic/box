@@ -315,7 +315,7 @@ func (b *Box) Run() {
 	go_shutdown_hook.Wait()
 }
 
-func (b Box) Stop() {
+func (b *Box) Stop() {
 	if b.broker != nil {
 		b.broker.Close()
 	}
@@ -329,46 +329,46 @@ func (b Box) Stop() {
 	}
 }
 
-func (b Box) Logger() interfaces.Logger {
+func (b *Box) Logger() interfaces.Logger {
 	return b.logger
 }
 
-func (b Box) Configuration() interfaces.Configuration {
+func (b *Box) Configuration() interfaces.Configuration {
 	return b.configuration
 }
 
-func (b Box) Cache() interfaces.Cache {
+func (b *Box) Cache() interfaces.Cache {
 	return b.cache
 }
 
-func (b Box) Broker() interfaces.Broker {
+func (b *Box) Broker() interfaces.Broker {
 	return b.broker
 }
 
-func (b Box) Client() interfaces.Client {
+func (b *Box) Client() interfaces.Client {
 	return b.client
 }
 
-func (b Box) Transport() interfaces.Transport {
+func (b *Box) Transport() interfaces.Transport {
 	return b.transport
 }
 
-func (b Box) Registry() interfaces.Registry {
+func (b *Box) Registry() interfaces.Registry {
 	return b.registry
 }
 
-func (b Box) AuthN() interfaces.AuthN {
+func (b *Box) AuthN() interfaces.AuthN {
 	return b.authN
 }
 
-func (b Box) AuthZ() interfaces.AuthZ {
+func (b *Box) AuthZ() interfaces.AuthZ {
 	return b.authZ
 }
 
-func (b Box) Store() interfaces.Store {
+func (b *Box) Store() interfaces.Store {
 	return b.store
 }
 
-func (b Box) Processors() []interfaces.Processor {
+func (b *Box) Processors() []interfaces.Processor {
 	return b.Processors()
 }

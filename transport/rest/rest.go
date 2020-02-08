@@ -18,15 +18,15 @@ import (
 
 type Rest struct {
 	interfaces.Logger
-	port         int
-	healthEndpoint       string
-	readTimeout  time.Duration
-	writeTimeout time.Duration
-	cert         string
-	key          string
-	server       *http.Server
-	www          string
-	router       *gin.Engine
+	port           int
+	healthEndpoint string
+	readTimeout    time.Duration
+	writeTimeout   time.Duration
+	cert           string
+	key            string
+	server         *http.Server
+	www            string
+	router         *gin.Engine
 }
 
 func WithLogger(logger interfaces.Logger) transport.Option {
@@ -97,7 +97,7 @@ func (r *Rest) scanPort(ip string, port int, timeout time.Duration) error {
 	if err = conn.Close(); err != nil {
 		return err
 	}
-	r.Warn(fmt.Sprintf("port %s is busy", port))
+	r.Warn(fmt.Sprintf("port %d is busy", port))
 	return nil
 }
 
@@ -115,11 +115,11 @@ func (r *Rest) findAlternativePort() error {
 
 func New(options ...transport.Option) (*Rest, error) {
 	rest := &Rest{
-		port:         8080,
-		healthEndpoint:       "/healthcheck",
-		readTimeout:  5 * time.Second,
-		writeTimeout: 5 * time.Second,
-		router:       gin.New(),
+		port:           8080,
+		healthEndpoint: "/healthcheck",
+		readTimeout:    5 * time.Second,
+		writeTimeout:   5 * time.Second,
+		router:         gin.New(),
 	}
 
 	for _, option := range options {
