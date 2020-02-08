@@ -168,13 +168,11 @@ func (m *Minio) List(bucket string, params ...interface{}) (interface{}, error) 
 	}
 	doneCh := make(chan struct{})
 	defer close(doneCh)
-	values := make([]interface{}, 0)
-	m.lock.Lock()
-	defer m.lock.Unlock()
-	for value := range client.ListObjectsV2(bucket, "", true, doneCh) {
-		values = append(values, value)
+	out := make(chan interface{})
+	for value := range client.ListObjectsV2(bucket, params[0].(string), true, doneCh) {
+		out <- value
 	}
-	return values, nil
+	return out, nil
 }
 
 func (m *Minio) Query(bucket string, params ...interface{}) (interface{}, error) {
