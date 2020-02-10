@@ -177,7 +177,7 @@ func (m *Minio) List(bucket string, params ...interface{}) (interface{}, error) 
 		}
 
 		value, err := ioutil.ReadAll(reader)
-		if err != nil {
+		if err == nil {
 			callback(value)
 		}
 		reader.Close()
