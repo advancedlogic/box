@@ -8,7 +8,6 @@ import (
 
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/store"
-	"github.com/advancedlogic/treedoo/models"
 	minio "github.com/minio/minio-go/v6"
 )
 
@@ -169,12 +168,21 @@ func (m *Minio) List(bucket string, params ...interface{}) (interface{}, error) 
 	}
 	doneCh := make(chan struct{})
 	defer close(doneCh)
-	out := make(chan models.Review)
-	for value := range client.ListObjectsV2(bucket, params[0].(string), true, doneCh) {
-		println(value)
-		out <- value
+	prefix := params[0].(string)
+	callback := params[1].(func([]byte))
+	for value := range client.ListObjectsV2(bucket, prefix, true, doneCh) {
+		reader, err := client.GetObject(bucket, value.Key, minio.GetObjectOptions{})
+		if err != nil {
+			return "", err
+		}
+
+		value, err := ioutil.ReadAll(reader)
+		if err != nil {
+			callback(value)
+		}
+		reader.Close()
 	}
-	return out, nil
+	return nil, nil
 }
 
 func (m *Minio) Query(bucket string, params ...interface{}) (interface{}, error) {
