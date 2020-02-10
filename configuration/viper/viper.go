@@ -173,3 +173,17 @@ func (v *Viper) Bool(key string, def bool) bool {
 	}
 	return value
 }
+
+func (v *Viper) MapOfStrings(path string, def map[string]string) map[string]string {
+	if value := v.Viper.GetStringMapString(path); value != nil {
+		return value
+	}
+	return def
+}
+
+func (v *Viper) ArrayOfStrings(path string, def []string) []string {
+	if value := v.GetStringSlice(path); value != nil {
+		return value
+	}
+	return def
+}

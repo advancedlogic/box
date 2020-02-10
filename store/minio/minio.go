@@ -8,6 +8,7 @@ import (
 
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/store"
+	"github.com/advancedlogic/treedoo/models"
 	minio "github.com/minio/minio-go/v6"
 )
 
@@ -168,8 +169,9 @@ func (m *Minio) List(bucket string, params ...interface{}) (interface{}, error) 
 	}
 	doneCh := make(chan struct{})
 	defer close(doneCh)
-	out := make(chan interface{})
+	out := make(chan models.Review)
 	for value := range client.ListObjectsV2(bucket, params[0].(string), true, doneCh) {
+		println(value)
 		out <- value
 	}
 	return out, nil
