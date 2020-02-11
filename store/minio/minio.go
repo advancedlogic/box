@@ -18,6 +18,7 @@ type Minio struct {
 	accessKey string
 	secretKey string
 	lock      sync.RWMutex
+	client    minio.Client
 }
 
 func WithLocation(location string) store.Option {
@@ -101,6 +102,12 @@ func New(options ...store.Option) (*Minio, error) {
 		}
 	}
 
+	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)
+	if err != nil {
+		return nil, err
+	}
+	m.client = client
+
 	return m, nil
 }
 
@@ -109,11 +116,9 @@ func (m Minio) Instance() interface{} {
 }
 
 func (m *Minio) Create(bucket string, key string, data interface{}) error {
+	client := m.client
 	reader := strings.NewReader(data.(string))
-	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)
-	if err != nil {
-		return err
-	}
+
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	_, err = client.PutObject(bucket, key, reader, -1, minio.PutObjectOptions{
@@ -127,10 +132,7 @@ func (m *Minio) Create(bucket string, key string, data interface{}) error {
 }
 
 func (m *Minio) Read(bucket string, key string) (interface{}, error) {
-	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)
-	if err != nil {
-		return "", err
-	}
+	client := m.client
 
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -152,20 +154,14 @@ func (m *Minio) Update(bucket string, key string, data interface{}) error {
 }
 
 func (m *Minio) Delete(bucket string, key string) error {
-	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)
-	if err != nil {
-		return err
-	}
+	client = m.client
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	return client.RemoveObject(bucket, key)
 }
 
 func (m *Minio) List(bucket string, params ...interface{}) (interface{}, error) {
-	client, err := minio.New(m.endpoint, m.accessKey, m.secretKey, false)
-	if err != nil {
-		return nil, err
-	}
+	client := m.client
 	doneCh := make(chan struct{})
 	defer close(doneCh)
 	prefix := params[0].(string)
