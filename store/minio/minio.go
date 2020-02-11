@@ -18,7 +18,7 @@ type Minio struct {
 	accessKey string
 	secretKey string
 	lock      sync.RWMutex
-	client    minio.Client
+	client    *minio.Client
 }
 
 func WithLocation(location string) store.Option {
