@@ -154,7 +154,7 @@ func (m *Minio) Update(bucket string, key string, data interface{}) error {
 }
 
 func (m *Minio) Delete(bucket string, key string) error {
-	client = m.client
+	client := m.client
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	return client.RemoveObject(bucket, key)
