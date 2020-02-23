@@ -121,7 +121,7 @@ func (m *Minio) Create(bucket string, key string, data interface{}) error {
 
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	_, err = client.PutObject(bucket, key, reader, -1, minio.PutObjectOptions{
+	_, err := client.PutObject(bucket, key, reader, -1, minio.PutObjectOptions{
 		ContentType: "plain/txt",
 	})
 	if err != nil {
