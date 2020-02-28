@@ -82,6 +82,37 @@ func WithWriteTimeout(timeout time.Duration) transport.Option {
 	}
 }
 
+func WithHandler(typ, path string, handlers ...gin.HandlerFunc) transport.Option {
+	return func(i interfaces.Transport) error  {
+		if handlers != nil {
+			r := i.(*Rest)
+			switch strings.ToLower(typ) {
+			case "get": r.router.GET(path, handlers...)
+			case "post": r.router.POST(path, handlers...)
+			case "delete": r.router.DELETE(path, handlers...)
+			case "put": r.router.PUT(path, handlers...)
+			default: r.router.GET(path, handlers...)
+			}
+			return nil
+		}
+		return errors.New("handlers cannot be null")
+	}
+}
+
+func WithStatic(path, folder string) transport.Option {
+	return func(i interfaces.Transport) error  {
+		if path == "" {
+			return errors.New("path cannot be empty")
+		}
+		if folder == "" {
+			return errors.New("folder cannot be empty")
+		}
+		r := i.(*Rest)
+		r.router.Static(path, folder)
+		return nil
+	}
+}
+
 func (r *Rest) scanPort(ip string, port int, timeout time.Duration) error {
 	target := fmt.Sprintf("%s:%d", ip, port)
 	conn, err := net.DialTimeout("tcp", target, timeout)
