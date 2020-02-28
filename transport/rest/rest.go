@@ -82,7 +82,7 @@ func WithWriteTimeout(timeout time.Duration) transport.Option {
 	}
 }
 
-func WithHandler(typ, path string, handlers ...gin.HandlerFunc) transport.Option {
+func WithHandlers(typ, path string, handlers ...gin.HandlerFunc) transport.Option {
 	return func(i interfaces.Transport) error  {
 		if handlers != nil {
 			r := i.(*Rest)
