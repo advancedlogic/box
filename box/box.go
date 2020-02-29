@@ -372,6 +372,3 @@ func (b *Box) Store() interfaces.Store {
 func (b *Box) Processors() []interfaces.Processor {
 	return b.Processors()
 }
-
-func (b *Box) Close() error { return nil }
-func (b *Box) Process(data interface{}) (interface{},error) { return nil, nil }
