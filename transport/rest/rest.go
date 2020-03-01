@@ -82,16 +82,21 @@ func WithWriteTimeout(timeout time.Duration) transport.Option {
 	}
 }
 
-func WithHandlers(typ, path string, handlers ...gin.HandlerFunc) transport.Option {
-	return func(i interfaces.Transport) error  {
+func WithHandler(typ, path string, handler gin.HandlerFunc) transport.Option {
+	return func(i interfaces.Transport) error {
 		if handlers != nil {
 			r := i.(*Rest)
 			switch strings.ToLower(typ) {
-			case "get": r.router.GET(path, handlers...)
-			case "post": r.router.POST(path, handlers...)
-			case "delete": r.router.DELETE(path, handlers...)
-			case "put": r.router.PUT(path, handlers...)
-			default: r.router.GET(path, handlers...)
+			case "get":
+				r.router.GET(path, handler)
+			case "post":
+				r.router.POST(path, handler)
+			case "delete":
+				r.router.DELETE(path, handler)
+			case "put":
+				r.router.PUT(path, handler)
+			default:
+				r.router.GET(path, handler)
 			}
 			return nil
 		}
@@ -99,8 +104,52 @@ func WithHandlers(typ, path string, handlers ...gin.HandlerFunc) transport.Optio
 	}
 }
 
+func WithGet(path string, handler gin.HandlerFunc) transport.Option {
+	return func(i interfaces.Transport) error {
+		if handler != nil {
+			r := i.(*Rest)
+			r.router.GET(path, handler)
+			return nil
+		}
+		return errors.New("handler cannot be null")
+	}
+}
+
+func WithPost(path string, handler gin.HandlerFunc) transport.Option {
+	return func(i interfaces.Transport) error {
+		if handler != nil {
+			r := i.(*Rest)
+			r.router.POST(path, handler)
+			return nil
+		}
+		return errors.New("handler cannot be null")
+	}
+}
+
+func WithPut(path string, handler gin.HandlerFunc) transport.Option {
+	return func(i interfaces.Transport) error {
+		if handler != nil {
+			r := i.(*Rest)
+			r.router.PUT(path, handler)
+			return nil
+		}
+		return errors.New("handler cannot be null")
+	}
+}
+
+func WithDelete(path string, handler gin.HandlerFunc) transport.Option {
+	return func(i interfaces.Transport) error {
+		if handler != nil {
+			r := i.(*Rest)
+			r.router.DELETE(path, handler)
+			return nil
+		}
+		return errors.New("handler cannot be null")
+	}
+}
+
 func WithStatic(path, folder string) transport.Option {
-	return func(i interfaces.Transport) error  {
+	return func(i interfaces.Transport) error {
 		if path == "" {
 			return errors.New("path cannot be empty")
 		}
