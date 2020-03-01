@@ -28,7 +28,7 @@ type Rest struct {
 	server         *http.Server
 	www            string
 	router         *gin.Engine
-	cors bool
+	cors           bool
 }
 
 func WithLogger(logger interfaces.Logger) transport.Option {
@@ -43,7 +43,7 @@ func WithLogger(logger interfaces.Logger) transport.Option {
 }
 
 func EnableCORS() transport.Option {
-	return func (t interfaces.Transport) error  {
+	return func(t interfaces.Transport) error {
 		rest := t.(*Rest)
 		rest.cors = true
 		return nil
@@ -94,7 +94,7 @@ func WithWriteTimeout(timeout time.Duration) transport.Option {
 
 func WithHandler(typ, path string, handler gin.HandlerFunc) transport.Option {
 	return func(i interfaces.Transport) error {
-		if handlers != nil {
+		if handler != nil {
 			r := i.(*Rest)
 			switch strings.ToLower(typ) {
 			case "get":
