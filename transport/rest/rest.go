@@ -10,6 +10,7 @@ import (
 
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/transport"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	ginlogrus "github.com/toorop/gin-logrus"
@@ -27,6 +28,7 @@ type Rest struct {
 	server         *http.Server
 	www            string
 	router         *gin.Engine
+	cors bool
 }
 
 func WithLogger(logger interfaces.Logger) transport.Option {
@@ -37,6 +39,14 @@ func WithLogger(logger interfaces.Logger) transport.Option {
 			return nil
 		}
 		return errors.New("logger cannot be nil")
+	}
+}
+
+func EnableCORS() transport.Option {
+	return func (t interfaces.Transport) error  {
+		rest := t.(*Rest)
+		rest.cors = true
+		return nil
 	}
 }
 
@@ -222,6 +232,12 @@ func (r *Rest) Listen() error {
 	router.GET(r.healthEndpoint, func(c *gin.Context) {
 		c.String(200, "transport service is good")
 	})
+
+	if r.cors {
+		config := cors.DefaultConfig()
+		config.AllowOrigins = []string{"*"}
+		router.Use(cors.New(config))
+	}
 
 	p := ginprometheus.NewPrometheus("gin")
 	p.Use(router)
