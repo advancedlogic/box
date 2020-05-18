@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
 	"github.com/advancedlogic/box/interfaces"
 	"github.com/advancedlogic/box/registry"
 	"github.com/hashicorp/consul/api"
@@ -12,8 +13,8 @@ import (
 type Client struct {
 	*api.Client
 	interfaces.Logger
-	address string
-	port    int
+	address        string
+	port           int
 	healthEndpoint string
 	interval       string
 	timeout        string
@@ -102,12 +103,12 @@ func WithCredentials(username, password string) registry.Option {
 
 func New(options ...registry.Option) (*Client, error) {
 	client := &Client{
-		address: "localhost:8500",
+		address:        "localhost:8500",
 		username:       "",
 		password:       "",
 		interval:       "3s",
 		timeout:        "5s",
-		healthEndpoint: "/healthcheck",
+		healthEndpoint: "http://localhost:8080/healthcheck",
 	}
 	for _, option := range options {
 		option(client)
@@ -139,16 +140,15 @@ func (c *Client) Register(name string) error {
 
 	address := hostname()
 	registration := &api.AgentServiceRegistration{
-		ID:   name,
-		Name: name,
-		Port: c.port,
+		ID:      name,
+		Name:    name,
+		Port:    c.port,
 		Address: address,
 	}
 
 	if c.healthEndpoint != "" {
 		registration.Check = new(api.AgentServiceCheck)
-		registration.Check.HTTP = fmt.Sprintf("http://%s:%v/%s",
-			address, c.port, c.healthEndpoint)
+		registration.Check.HTTP = fmt.Sprintf(c.healthEndpoint)
 		registration.Check.Interval = c.interval
 		registration.Check.Timeout = c.timeout
 	}
