@@ -1,11 +1,12 @@
 package ledis
 
 import (
+	"context"
 	"errors"
 
 	"github.com/advancedlogic/box/cache"
 	"github.com/advancedlogic/box/interfaces"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 type Ledis struct {
@@ -16,6 +17,7 @@ type Ledis struct {
 	db            int
 	clusterClient *redis.ClusterClient
 	client        *redis.Client
+	ctx           context.Context
 }
 
 func WithCollection(collection string) cache.Option {
@@ -67,6 +69,7 @@ func AddEndpoints(endpoints ...string) cache.Option {
 func New(options ...cache.Option) (*Ledis, error) {
 	ledis := &Ledis{
 		endpoints: make([]string, 0),
+		ctx:       context.Background(),
 	}
 	for _, option := range options {
 		if err := option(ledis); err != nil {
@@ -89,9 +92,9 @@ func (l *Ledis) Connect() error {
 			Addrs:    l.endpoints,
 			Password: l.password,
 		})
-		status := clusterClient.Ping()
-		if status.Err() != nil {
-			return status.Err()
+		_, err := clusterClient.Ping(l.ctx).Result()
+		if err != nil {
+			return err
 		}
 		l.clusterClient = clusterClient
 	} else {
@@ -115,9 +118,9 @@ func (l *Ledis) Close() error {
 func (l *Ledis) Set(key string, value interface{}, ttl int) error {
 	var status *redis.StatusCmd
 	if l.client != nil {
-		status = l.client.Set(key, value, -1)
+		status = l.client.Set(l.ctx, key, value, -1)
 	} else {
-		status = l.clusterClient.Set(key, value, -1)
+		status = l.clusterClient.Set(l.ctx, key, value, -1)
 	}
 	if status.Err() != nil {
 		return status.Err()
@@ -128,9 +131,9 @@ func (l *Ledis) Set(key string, value interface{}, ttl int) error {
 func (l *Ledis) Get(key string) (interface{}, error) {
 	var status *redis.StringCmd
 	if l.client != nil {
-		status = l.client.Get(key)
+		status = l.client.Get(l.ctx, key)
 	} else {
-		status = l.clusterClient.Get(key)
+		status = l.clusterClient.Get(l.ctx, key)
 	}
 	if status.Err() != nil {
 		return nil, status.Err()
@@ -142,9 +145,9 @@ func (l *Ledis) Get(key string) (interface{}, error) {
 func (l *Ledis) Keys() (interface{}, error) {
 	var status *redis.StringSliceCmd
 	if l.client != nil {
-		status = l.client.Keys("*")
+		status = l.client.Keys(l.ctx, "*")
 	} else {
-		status = l.clusterClient.Keys("*")
+		status = l.clusterClient.Keys(l.ctx, "*")
 	}
 	if status.Err() != nil {
 		return nil, status.Err()
