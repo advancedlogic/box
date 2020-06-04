@@ -159,9 +159,11 @@ func (c *Client) Register(name string) error {
 	for counter := 0; counter < 10; counter++ {
 		err = c.Client.Agent().ServiceRegister(registration)
 		if err != nil {
+			c.Logger.Info(fmt.Sprintf("Connected to register with health endpoint %s\n", c.healthEndpoint))
 			break
 		}
 		counter++
+		c.Logger.Warn(fmt.Sprintf("Attempt nr.%d failed with error %s\n", counter, err.Error()))
 		time.Sleep(time.Duration(counter) * time.Second)
 	}
 	return err
