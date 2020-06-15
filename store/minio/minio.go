@@ -115,27 +115,27 @@ func (m Minio) Instance() interface{} {
 	return nil
 }
 
-// func (m Minio) createBucketIfNotExists(bucket string) error {
-// 	buckets, err := m.client.ListBuckets()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	exists := false
-// 	for _, b := range buckets {
-// 		if bucket == b {
-// 			exists = true
-// 			break
-// 		}
-// 	}
-// 	if !exists {
-// 		err = m.client.MakeBucket(bucket)
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
+func (m Minio) CreateBucketIfNotExists(bucket string) error {
+	buckets, err := m.client.ListBuckets()
+	if err != nil {
+		return err
+	}
+	exists := false
+	for _, b := range buckets {
+		if bucket == b.Name {
+			exists = true
+			break
+		}
+	}
+	if !exists {
+		err = m.client.MakeBucket(bucket, "")
+		if err != nil {
+			return err
+		}
+	}
 
-// 	return nil
-// }
+	return nil
+}
 
 func (m *Minio) Create(bucket string, key string, data interface{}) error {
 	client := m.client
