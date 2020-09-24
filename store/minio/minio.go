@@ -115,6 +115,19 @@ func (m Minio) Instance() interface{} {
 	return nil
 }
 
+func (m Minio) Buckets() ([]string, error) {
+	buckets, err := m.client.ListBuckets()
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, len(buckets), len(buckets))
+	for b, bucket := range buckets  {
+		names[b] = bucket.Name
+	}
+
+	return names, nil
+}
+
 func (m Minio) CreateBucketIfNotExists(bucket string) error {
 	buckets, err := m.client.ListBuckets()
 	if err != nil {
