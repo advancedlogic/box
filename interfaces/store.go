@@ -7,4 +7,5 @@ type Store interface {
 	Delete(string, string) error
 	List(string, ...interface{}) (interface{}, error)
 	Query(string, ...interface{}) (interface{}, error)
+	Buckets() (interface{}, error)
 }

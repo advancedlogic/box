@@ -115,7 +115,7 @@ func (m Minio) Instance() interface{} {
 	return nil
 }
 
-func (m Minio) Buckets() ([]string, error) {
+func (m Minio) Buckets() (interface{}, error) {
 	buckets, err := m.client.ListBuckets()
 	if err != nil {
 		return nil, err
